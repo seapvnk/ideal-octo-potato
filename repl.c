@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 typedef struct
 {
@@ -17,8 +18,6 @@ input_buffer* new_input_buffer()
 
     return ibuffer;
 }
-
-
 
 void free_input_buffer(input_buffer* ibuffer)
 {

@@ -9,7 +9,7 @@
 int main(int argc, char const *argv[])
 {
     input_buffer* ibuffer = new_input_buffer();
-    while(true)
+    while (true)
     {
         printf("iop ~> ");
         read_input(ibuffer);

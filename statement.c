@@ -1,3 +1,5 @@
+#include "stdio.h"
+#include "./tokenize.c"
 typedef enum {
     PREPARE_SUCCESS,
     PREPARE_UNRECOGNIZED_STATEMENT
@@ -14,19 +16,21 @@ typedef struct {
 
 stmt_prepare_result prepare_statement(char* buffer, stmt* statement)
 {
-    if (!strncmp(buffer, "insert", 6))
+    sql_token_collection* token_collection = tokenize(buffer);
+
+    for (int i = 0; i < token_collection->length; i++)
     {
-        statement->type = STATEMENT_INSERT;
-        return PREPARE_SUCCESS;
+        printf(
+            "[%d] [%s]\n", 
+            token_collection->tokens[i].type,
+            token_collection->tokens[i].value
+        );
     }
 
-    if (!strncmp(buffer, "select", 6))
-    {
-        statement->type = STATEMENT_SELECT;
-        return PREPARE_SUCCESS;
-    }
+    putchar('\n');
+    free_sql_token_collection(token_collection);
 
-    return PREPARE_UNRECOGNIZED_STATEMENT;
+    return PREPARE_SUCCESS;
 }
 
 void execute_statement(stmt *statement)
