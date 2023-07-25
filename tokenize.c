@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
-#define TK_SPACE 32
 #define TK_SELECT 448
 #define TK_INSERT 469
 #define TK_DELETE 435
@@ -30,6 +30,9 @@ sql_token_collection* new_sql_token_collection()
 
 void free_sql_token_collection(sql_token_collection* token_collection)
 {
+    for (int i = 0; i < token_collection->length; i++)
+        free(token_collection->tokens[i].value);
+
     free(token_collection->tokens);
     free(token_collection);
 }
@@ -49,18 +52,23 @@ sql_token_collection* tokenize(char* sql_string)
     size_t sql_string_length = strlen(sql_string);
 
     int token_type = 0;
-    char token_buffer[1024];
+    char* token_buffer = NULL;
     int buffer_index = 0;
 
     for (int str_index = 0; str_index < sql_string_length; str_index++)
     {
         char c = *(sql_string + str_index);
-        token_buffer[buffer_index++] = c;
+        
+        token_buffer = realloc(token_buffer, sizeof(char) * buffer_index+1);
+        *(token_buffer + buffer_index++) = c;
         token_type += (int) c;
         
-        if (*(sql_string + str_index + 1) == TK_SPACE || str_index+1 == sql_string_length)
+        bool is_space = *(sql_string + str_index + 1) == ' ';
+        bool is_end_of_buffer = str_index+1 == sql_string_length;
+
+        if (is_space || is_end_of_buffer)
         {
-            token_buffer[buffer_index] = '\0';
+            *(token_buffer + buffer_index) = '\0';
             sql_token token;
             token.type = token_type;
             token.value = (char*) malloc(sizeof(char) * buffer_index);
@@ -75,6 +83,8 @@ sql_token_collection* tokenize(char* sql_string)
 
         if (str_index+1 == sql_string_length) break;
     }
+
+    free(token_buffer);
 
     return tokens;
 }
